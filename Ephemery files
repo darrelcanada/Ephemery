@@ -1,4 +1,4 @@
-download the ephemery testnet files that the clients use to configure themselves
+Installing  ephemery testnet files 
 
 Create Directory /etc/ephemery
 
@@ -62,60 +62,6 @@ drwxr-xr-x 2 root root     4096 Oct 24 18:34 bootnode-keys
 
 
 
-Configure the Service Start file for Lighthouse in nano
-
-```bash
-sudo nano /etc/systemd/system/consensus.service
-```
-
-```bash
-[Unit]
-Description=Lighthouse Consensus Layer Client service for Holesky
-Wants=network-online.target
-After=network-online.target
-Documentation=https://www.coincashew.com
-
-[Service]
-Type=simple
-User=consensus
-Group=consensus
-Restart=on-failure
-RestartSec=3
-KillSignal=SIGINT
-TimeoutStopSec=900
-EnvironmentFile=/etc/ephemery/nodevars_env.txt
-ExecStart=/usr/local/bin/lighthouse bn \
-  --datadir /var/lib/lighthouse \
-  --testnet-dir /etc/ephemery \
-  --staking \
-  --validator-monitor-auto \
-  --metrics \
-  --port 9000 \
-  --quic-port 9001 \
-  --http-port 5052 \
-  --target-peers 100 \
-  --metrics-port 8008 \
-  --execution-endpoint http://127.0.0.1:8551 \
-  --execution-jwt /secrets/jwtsecret \
-  --boot-nodes=${BOOTNODE_ENR_LIST}
-
-[Install]
-WantedBy=multi-user.target
-```
-To exit and save, press Ctrl + X, then Y, then Enter.
-
-
-Reload the service files 
-
-``bash
-sudo systemctl daemon-reload
-```
-
-Start the services
-
-```bash
-sudo systemctl start execution consensus
-```
 
 Installing Nethermind Client
 
@@ -196,14 +142,118 @@ ExecStart=/usr/local/bin/nethermind/nethermind \
 [Install]
 WantedBy=multi-user.target
 ```
-
 To exit and save, press Ctrl + X, then Y, then Enter.
+
 
 Run the following to enable auto-start at boot time.
 
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable execution
+```
+
+
+
+
+
+
+
+
+Installing Lighthouse Client
+
+1. Initial configuration
+Create a service user for the consensus service, create data directory and assign ownership.
+
+```bash
+sudo adduser --system --no-create-home --group consensus
+sudo mkdir -p /var/lib/lighthouse
+sudo chown -R consensus:consensus /var/lib/lighthouse
+```
+
+Install dependencies.
+
+```bash
+sudo apt install curl ccze jq -y
+```
+
+2. Install Binaries
+Run the following to automatically download the latest linux release, un-tar and cleanup.
+
+```bash
+RELEASE_URL="https://api.github.com/repos/sigp/lighthouse/releases/latest"
+BINARIES_URL="$(curl -s $RELEASE_URL | jq -r ".assets[] | select(.name) | .browser_download_url" | grep x86_64-unknown-linux-gnu.tar.gz$)"
+
+echo Downloading URL: $BINARIES_URL
+
+cd $HOME
+# Download
+wget -O lighthouse.tar.gz $BINARIES_URL
+# Untar
+tar -xzvf lighthouse.tar.gz -C $HOME
+# Cleanup
+rm lighthouse.tar.gz
+```
+
+Install the binaries.
+
+```bash
+sudo mv $HOME/lighthouse /usr/local/bin/lighthouse
+```
+
+3. Setup and configure systemd
+Create a systemd unit file to define your consensus.service configuration.
+
+```bash
+sudo nano /etc/systemd/system/consensus.service
+```
+
+```bash
+[Unit]
+Description=Lighthouse Consensus Layer Client service for Holesky
+Wants=network-online.target
+After=network-online.target
+Documentation=https://www.coincashew.com
+
+[Service]
+Type=simple
+User=consensus
+Group=consensus
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=900
+EnvironmentFile=/etc/ephemery/nodevars_env.txt
+ExecStart=/usr/local/bin/lighthouse bn \
+  --datadir /var/lib/lighthouse \
+  --testnet-dir /etc/ephemery \
+  --staking \
+  --validator-monitor-auto \
+  --metrics \
+  --port 9000 \
+  --quic-port 9001 \
+  --http-port 5052 \
+  --target-peers 100 \
+  --metrics-port 8008 \
+  --execution-endpoint http://127.0.0.1:8551 \
+  --execution-jwt /secrets/jwtsecret \
+  --boot-nodes=${BOOTNODE_ENR_LIST}
+
+[Install]
+WantedBy=multi-user.target
+```
+To exit and save, press Ctrl + X, then Y, then Enter.
+
+Run the following to enable auto-start at boot time.
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable consensus
+```
+
+Start the services  
+
+```bash
+sudo systemctl start execution consensus
 ```
 
 4. Helpful execution client commands
@@ -216,11 +266,14 @@ Reset Database
    sudo rm -rf /var/lib/nethermind/*
    sudo systemctl restart execution
 
-
-
-
-
-
-
+Helpful consensus client commands
+View Logs:   sudo journalctl -fu consensus | ccze  
+Stop:        sudo systemctl stop consensus
+Start:       sudo systemctl start consensus
+View Status: sudo systemctl status consensus
+Reset Database
+   sudo systemctl stop consensus
+   sudo rm -rf /var/lib/lighthouse/beacon
+   sudo systemctl restart consensus
 
 
