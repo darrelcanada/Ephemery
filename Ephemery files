@@ -59,7 +59,7 @@ drwxr-xr-x 2 root root     4096 Oct 24 18:34 bootnode-keys
 -rw-r--r-- 1 root root      413 Oct 24 18:34 validator-names.yaml
 ```
 
-Edit the start command for nethermind
+Configure the Service Start file for nethermind in nano
 
 ```bash
 sudo nano /etc/systemd/system/execution.service
@@ -99,11 +99,66 @@ ExecStart=/usr/local/bin/nethermind/nethermind \
 WantedBy=multi-user.target
 ```
 
+Save and exit with ctrl X: Save Y: Enter 
 
 
-
-
+Configure the Service Start file for Lighthouse in nano
 
 ```bash
-
+sudo nano /etc/systemd/system/consensus.service
 ```
+
+```bash
+[Unit]
+Description=Lighthouse Consensus Layer Client service for Holesky
+Wants=network-online.target
+After=network-online.target
+Documentation=https://www.coincashew.com
+
+[Service]
+Type=simple
+User=consensus
+Group=consensus
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=900
+EnvironmentFile=/etc/ephemery/nodevars_env.txt
+ExecStart=/usr/local/bin/lighthouse bn \
+  --datadir /var/lib/lighthouse \
+  --testnet-dir /etc/ephemery \
+  --staking \
+  --validator-monitor-auto \
+  --metrics \
+  --port 9000 \
+  --quic-port 9001 \
+  --http-port 5052 \
+  --target-peers 100 \
+  --metrics-port 8008 \
+  --execution-endpoint http://127.0.0.1:8551 \
+  --execution-jwt /secrets/jwtsecret \
+  --boot-nodes=${BOOTNODE_ENR_LIST}
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Save and exit with ctrl X: Save Y: Enter 
+
+Reload the service files 
+
+``bash
+sudo systemctl daemon-reload
+```
+
+Start the services
+
+```bash
+sudo systemctl start execution consensus
+```
+
+
+
+
+
+
