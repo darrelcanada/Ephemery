@@ -102,8 +102,8 @@ ExecStart=/usr/local/bin/lighthouse bn \
 [Install]
 WantedBy=multi-user.target
 ```
+To exit and save, press Ctrl + X, then Y, then Enter.
 
-Save and exit with ctrl X: Save Y: Enter 
 
 Reload the service files 
 
