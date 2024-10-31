@@ -1,6 +1,6 @@
 download the ephemery testnet files that the clients use to configure themselves
 
-Create Directory
+Create Directory /etc/ephemery
 
 ```bash
 sudo mkdir /etc/ephemery
@@ -13,10 +13,17 @@ wget testnet-all.tar.gz
 sudo wget https://github.com/ephemery-testnet/ephemery-genesis/releases/download/ephemery-139/testnet-all.tar.gz
 ```
 
-Then unpack the archive with 
+Then unpack the archive 
 
 ```bash
 sudo tar xzvf testnet-all.tar.gz
+```
+
+Set Permissions for /etc/ephemery$
+
+```bash
+sudo chown root:root *
+sudo chown root:root .
 ```
 
 
