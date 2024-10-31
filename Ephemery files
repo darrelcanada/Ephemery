@@ -1,7 +1,15 @@
 download the ephemery testnet files that the clients use to configure themselves
 
 Create Directory
+
 ```bash
 sudo mkdir /etc/ephemery
 cd /etc/ephemery
 ```
+
+```bash
+sudo adduser --system --no-create-home --group execution
+sudo mkdir -p /var/lib/nethermind
+sudo chown -R execution:execution /var/lib/nethermind
+```
+
