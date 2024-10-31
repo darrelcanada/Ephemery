@@ -1,0 +1,4 @@
+download the ephemery testnet files that the clients use to configure themselves
+
+sudo mkdir /etc/ephemery
+cd /etc/ephemery
