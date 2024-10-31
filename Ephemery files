@@ -1,4 +1,4 @@
-# download the ephemery testnet files that the clients use to configure themselves
+download the ephemery testnet files that the clients use to configure themselves
 
 Create Directory /etc/ephemery
 
@@ -7,7 +7,7 @@ sudo mkdir /etc/ephemery
 cd /etc/ephemery
 ```
 
-wget testnet-all.tar.gz
+wget testnet-all.tar.gz (use correct Iteration number ie: 139)
 
 ```bash
 sudo wget https://github.com/ephemery-testnet/ephemery-genesis/releases/download/ephemery-139/testnet-all.tar.gz
@@ -19,7 +19,7 @@ Then unpack the archive
 sudo tar xzvf testnet-all.tar.gz
 ```
 
-Set Permissions for /etc/ephemery$
+Set Permissions for Ephermery files and directory
 
 ```bash
 sudo chown root:root *
@@ -57,4 +57,53 @@ drwxr-xr-x 2 root root     4096 Oct 24 18:34 bootnode-keys
 -rw-r--r-- 1 root root      175 Oct 24 18:34 retention.vars
 -rw-r--r-- 1 root root  2980957 Oct 24 18:34 testnet-all.tar.gz
 -rw-r--r-- 1 root root      413 Oct 24 18:34 validator-names.yaml
+```
+
+Edit the start command for nethermind
+
+```bash
+sudo nano /etc/systemd/system/execution.service
+```
+
+```bash
+[Service]
+Type=simple
+User=execution
+Group=execution
+Restart=always
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=900
+WorkingDirectory=/var/lib/nethermind
+Environment="DOTNET_BUNDLE_EXTRACT_BASE_DIR=/var/lib/nethermind"
+EnvironmentFile=/etc/ephemery/nodevars_env.txt
+ExecStart=/usr/local/bin/nethermind/nethermind \
+  --config none.cfg \
+  --datadir="/var/lib/nethermind" \
+  --Network.DiscoveryPort 30303 \
+  --Network.P2PPort 30303 \
+  --Network.MaxActivePeers 50 \
+  --JsonRpc.Port 8545 \
+  --JsonRpc.EnginePort 8551 \
+  --Metrics.Enabled true \
+  --Metrics.ExposePort 6060 \
+  --JsonRpc.JwtSecretFile /secrets/jwtsecret \
+  --Pruning.Mode=Hybrid \
+  --Pruning.FullPruningTrigger=VolumeFreeSpace \
+  --Pruning.FullPruningThresholdMb=300000 \
+  --JsonRpc.Enabled true \
+  --Discovery.Bootnodes=${BOOTNODE_ENODE_LIST} \
+  --Init.ChainSpecPath /etc/ephemery/chainspec.json \
+  --Init.GenesisHash ${GENESIS_BLOCK}
+[Install]
+WantedBy=multi-user.target
+```
+
+
+
+
+
+
+```bash
+
 ```
