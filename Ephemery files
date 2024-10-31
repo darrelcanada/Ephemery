@@ -159,6 +159,17 @@ sudo systemctl start execution consensus
 
 
 
+1. Initial configuration
+Create a service user for the execution service, create data directory and assign ownership.
 
+Copy
+sudo adduser --system --no-create-home --group execution
+sudo mkdir -p /var/lib/nethermind
+sudo chown -R execution:execution /var/lib/nethermind
+Install dependencies.
+
+Copy
+sudo apt update
+sudo apt install ccze curl libsnappy-dev libc6-dev jq libc6 unzip -y
 
 
