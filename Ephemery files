@@ -59,47 +59,7 @@ drwxr-xr-x 2 root root     4096 Oct 24 18:34 bootnode-keys
 -rw-r--r-- 1 root root      413 Oct 24 18:34 validator-names.yaml
 ```
 
-Configure the Service Start file for nethermind in nano
 
-```bash
-sudo nano /etc/systemd/system/execution.service
-```
-
-```bash
-[Service]
-Type=simple
-User=execution
-Group=execution
-Restart=always
-RestartSec=3
-KillSignal=SIGINT
-TimeoutStopSec=900
-WorkingDirectory=/var/lib/nethermind
-Environment="DOTNET_BUNDLE_EXTRACT_BASE_DIR=/var/lib/nethermind"
-EnvironmentFile=/etc/ephemery/nodevars_env.txt
-ExecStart=/usr/local/bin/nethermind/nethermind \
-  --config none.cfg \
-  --datadir="/var/lib/nethermind" \
-  --Network.DiscoveryPort 30303 \
-  --Network.P2PPort 30303 \
-  --Network.MaxActivePeers 50 \
-  --JsonRpc.Port 8545 \
-  --JsonRpc.EnginePort 8551 \
-  --Metrics.Enabled true \
-  --Metrics.ExposePort 6060 \
-  --JsonRpc.JwtSecretFile /secrets/jwtsecret \
-  --Pruning.Mode=Hybrid \
-  --Pruning.FullPruningTrigger=VolumeFreeSpace \
-  --Pruning.FullPruningThresholdMb=300000 \
-  --JsonRpc.Enabled true \
-  --Discovery.Bootnodes=${BOOTNODE_ENODE_LIST} \
-  --Init.ChainSpecPath /etc/ephemery/chainspec.json \
-  --Init.GenesisHash ${GENESIS_BLOCK}
-[Install]
-WantedBy=multi-user.target
-```
-
-Save and exit with ctrl X: Save Y: Enter 
 
 
 Configure the Service Start file for Lighthouse in nano
@@ -157,19 +117,110 @@ Start the services
 sudo systemctl start execution consensus
 ```
 
-
+Installing Nethermind Client
 
 1. Initial configuration
 Create a service user for the execution service, create data directory and assign ownership.
 
-Copy
+```bash
 sudo adduser --system --no-create-home --group execution
 sudo mkdir -p /var/lib/nethermind
 sudo chown -R execution:execution /var/lib/nethermind
+```
+
 Install dependencies.
 
-Copy
+```bash
 sudo apt update
 sudo apt install ccze curl libsnappy-dev libc6-dev jq libc6 unzip -y
+```
+
+2. Install Binaries
+
+Run the following to automatically download the latest linux release, un-zip and cleanup.
+
+```bash
+RELEASE_URL="https://api.github.com/repos/NethermindEth/nethermind/releases/latest"
+BINARIES_URL="$(curl -s $RELEASE_URL | jq -r ".assets[] | select(.name) | .browser_download_url" | grep linux-x64)"
+
+echo Downloading URL: $BINARIES_URL
+
+cd $HOME
+wget -O nethermind.zip $BINARIES_URL
+unzip -o nethermind.zip -d $HOME/nethermind
+rm nethermind.zip
+```
+
+Install the binaries.
+
+```bash
+sudo mv $HOME/nethermind /usr/local/bin/nethermind
+```
+
+3. Setup and configure systemd for Nethermind
+
+```bash
+sudo nano /etc/systemd/system/execution.service
+```
+
+```bash
+[Service]
+Type=simple
+User=execution
+Group=execution
+Restart=always
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=900
+WorkingDirectory=/var/lib/nethermind
+Environment="DOTNET_BUNDLE_EXTRACT_BASE_DIR=/var/lib/nethermind"
+EnvironmentFile=/etc/ephemery/nodevars_env.txt
+ExecStart=/usr/local/bin/nethermind/nethermind \
+  --config none.cfg \
+  --datadir="/var/lib/nethermind" \
+  --Network.DiscoveryPort 30303 \
+  --Network.P2PPort 30303 \
+  --Network.MaxActivePeers 50 \
+  --JsonRpc.Port 8545 \
+  --JsonRpc.EnginePort 8551 \
+  --Metrics.Enabled true \
+  --Metrics.ExposePort 6060 \
+  --JsonRpc.JwtSecretFile /secrets/jwtsecret \
+  --Pruning.Mode=Hybrid \
+  --Pruning.FullPruningTrigger=VolumeFreeSpace \
+  --Pruning.FullPruningThresholdMb=300000 \
+  --JsonRpc.Enabled true \
+  --Discovery.Bootnodes=${BOOTNODE_ENODE_LIST} \
+  --Init.ChainSpecPath /etc/ephemery/chainspec.json \
+  --Init.GenesisHash ${GENESIS_BLOCK}
+[Install]
+WantedBy=multi-user.target
+```
+
+To exit and save, press Ctrl + X, then Y, then Enter.
+
+Run the following to enable auto-start at boot time.
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable execution
+```
+
+4. Helpful execution client commands
+View Logs:   sudo journalctl -fu execution | ccze  
+Stop:        sudo systemctl stop execution
+Start:       sudo systemctl start execution
+View Status: sudo systemctl status execution
+Reset Database
+   sudo systemctl stop execution
+   sudo rm -rf /var/lib/nethermind/*
+   sudo systemctl restart execution
+
+
+
+
+
+
+
 
 
