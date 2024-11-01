@@ -292,8 +292,6 @@ sudo systemctl restart consensus
 <summary>## Helpful consensus client commands
 </summary>
 
-Here’s some more information about the topic.
-
 ```bash
 #View Logs:
 sudo journalctl -fu consensus | ccze  
@@ -309,7 +307,7 @@ sudo rm -rf /var/lib/lighthouse/beacon
 sudo systemctl restart consensus
 ```
 <details>
-<summary>## Helpful consensus client commands
+<summary>Helpful consensus client commands
 </summary>
 
 You can add [links](https://example.com) and other Markdown elements too!
