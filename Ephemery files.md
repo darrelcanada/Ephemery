@@ -266,14 +266,20 @@ Reset Database
    sudo rm -rf /var/lib/nethermind/*
    sudo systemctl restart execution
 
-Helpful consensus client commands
-View Logs:   sudo journalctl -fu consensus | ccze  
-Stop:        sudo systemctl stop consensus
-Start:       sudo systemctl start consensus
-View Status: sudo systemctl status consensus
-Reset Database
-   sudo systemctl stop consensus
-   sudo rm -rf /var/lib/lighthouse/beacon
-   sudo systemctl restart consensus
+## Helpful consensus client commands
 
+```bash
+#View Logs:
+sudo journalctl -fu consensus | ccze  
+#Stop:
+sudo systemctl stop consensus
+#Start:
+sudo systemctl start consensus
+#View Status:
+sudo systemctl status consensus
+#Reset Database
+sudo systemctl stop consensus
+sudo rm -rf /var/lib/lighthouse/beacon
+sudo systemctl restart consensus
+```
 
