@@ -1,4 +1,4 @@
-Installing  ephemery testnet files 
+##Installing  ephemery testnet files 
 
 Create Directory /etc/ephemery
 
@@ -9,7 +9,7 @@ cd /etc/ephemery
 
 wget testnet-all.tar.gz (use correct Iteration number ie: 139)
 
-#!/bin/bash
+´´´bash
 sudo wget https://github.com/ephemery-testnet/ephemery-genesis/releases/download/ephemery-139/testnet-all.tar.gz
 ```
 
