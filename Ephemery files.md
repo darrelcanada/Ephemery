@@ -1,4 +1,4 @@
-## Installing  ephemery testnet files 
+# Installing  ephemery testnet files 
 
 Create Directory /etc/ephemery
 
@@ -63,9 +63,9 @@ drwxr-xr-x 2 root root     4096 Oct 24 18:34 bootnode-keys
 
 
 
-## Installing Nethermind Client
+# Installing Nethermind Client
 
-# 1. Initial configuration
+## 1. Initial configuration
 Create a service user for the execution service, create data directory and assign ownership.
 
 ```bash
@@ -81,7 +81,7 @@ sudo apt update
 sudo apt install ccze curl libsnappy-dev libc6-dev jq libc6 unzip -y
 ```
 
-# 2. Install Binaries
+## 2. Install Binaries
 
 Run the following to automatically download the latest linux release, un-zip and cleanup.
 
@@ -103,7 +103,7 @@ Install the binaries.
 sudo mv $HOME/nethermind /usr/local/bin/nethermind
 ```
 
-# 3. Setup and configure systemd for Nethermind
+## 3. Setup and configure systemd for Nethermind
 
 ```bash
 sudo nano /etc/systemd/system/execution.service
@@ -159,9 +159,9 @@ sudo systemctl enable execution
 
 
 
-## Installing Lighthouse Client
+# Installing Lighthouse Client
 
-# 1. Initial configuration
+## 1. Initial configuration
 Create a service user for the consensus service, create data directory and assign ownership.
 
 ```bash
@@ -176,7 +176,7 @@ Install dependencies.
 sudo apt install curl ccze jq -y
 ```
 
-# 2. Install Binaries
+## 2. Install Binaries
 Run the following to automatically download the latest linux release, un-tar and cleanup.
 
 ```bash
@@ -200,7 +200,7 @@ Install the binaries.
 sudo mv $HOME/lighthouse /usr/local/bin/lighthouse
 ```
 
-# 3. Setup and configure systemd
+## 3. Setup and configure systemd
 Create a systemd unit file to define your consensus.service configuration.
 
 ```bash
@@ -256,7 +256,7 @@ Start the services
 sudo systemctl start execution consensus
 ```
 
-# 4. Helpful execution client commands
+## 4. Helpful execution client commands
 View Logs:   sudo journalctl -fu execution | ccze  
 Stop:        sudo systemctl stop execution
 Start:       sudo systemctl start execution
