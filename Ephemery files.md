@@ -257,14 +257,20 @@ sudo systemctl start execution consensus
 ```
 
 ## 4. Helpful execution client commands
-View Logs:   sudo journalctl -fu execution | ccze  
-Stop:        sudo systemctl stop execution
-Start:       sudo systemctl start execution
-View Status: sudo systemctl status execution
-Reset Database
-   sudo systemctl stop execution
-   sudo rm -rf /var/lib/nethermind/*
-   sudo systemctl restart execution
+```bash
+#View Logs:
+sudo journalctl -fu execution | ccze  
+#Stop:
+sudo systemctl stop execution
+#Start:
+sudo systemctl start execution
+#View Status:
+sudo systemctl status execution
+#Reset Database
+sudo systemctl stop execution
+sudo rm -rf /var/lib/nethermind/*
+sudo systemctl restart execution
+```
 
 ## Helpful consensus client commands
 
