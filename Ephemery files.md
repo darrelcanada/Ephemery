@@ -289,8 +289,7 @@ sudo rm -rf /var/lib/lighthouse/beacon
 sudo systemctl restart consensus
 ```
 <details>
-<summary>## Helpful consensus client commands
-</summary>
+<summary>Helpful consensus client commands</summary>
 
 ```bash
 #View Logs:
@@ -307,10 +306,25 @@ sudo rm -rf /var/lib/lighthouse/beacon
 sudo systemctl restart consensus
 ```
 <details>
-<summary>Helpful consensus client commands
-</summary>
 
-You can add [links](https://example.com) and other Markdown elements too!
 
+
+<details>
+<summary>Helpful execution client commands</summary>
+
+```bash
+#View Logs:
+sudo journalctl -fu execution | ccze  
+#Stop:
+sudo systemctl stop execution
+#Start:
+sudo systemctl start execution
+#View Status:
+sudo systemctl status execution
+#Reset Database
+sudo systemctl stop execution
+sudo rm -rf /var/lib/nethermind/*
+sudo systemctl restart execution
+```
 </details>
 
