@@ -305,7 +305,7 @@ sudo systemctl stop consensus
 sudo rm -rf /var/lib/lighthouse/beacon
 sudo systemctl restart consensus
 ```
-<details>
+
 
 
 
