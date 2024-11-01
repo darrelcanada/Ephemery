@@ -31,7 +31,7 @@ Show permissions for Ephemery config files
 ```bash
 ls -l
 ```
-Should show root permission
+Should show root permissions
 
 ```bash
 -rw-r--r-- 1 root root    41514 Oct 24 18:34 besu.json
