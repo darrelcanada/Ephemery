@@ -1,12 +1,60 @@
 ## Download binary executable file
-Navigate to the [Releases page](https://github.com/eth-educators/ethstaker-deposit-cli/releases) of the ethstaker-deposit-cli repository.
-Download a file from the command line directly into your Downloads directory
+Download the latest release from [Releases page](https://github.com/eth-educators/ethstaker-deposit-cli/releases) of the ethstaker-deposit-cli for the most current repository.
 
-'''bash
+Navagte to your destination directory and download file using ```wget```
+
+```bash
 cd ~/Downloads
+wget https://github.com/eth-educators/ethstaker-deposit-cli/releases/download/v0.2.1/ethstaker_deposit-cli-66054f5-linux-amd64.tar.gz
+```
 
-'''
+```-L``` tells curl to follow redirects (useful for GitHub links).
+
+```-O``` saves the file with its original name.
+
 
 ## Extract the contents of the zipped file
 
+Extract the tar.gz file:
 
+```bash
+tar -xzf ethstaker_deposit-cli-66054f5-linux-amd64.tar.gz
+```
+
+The ```-x``` flag extracts the files.
+
+The ```-z``` flag handles .gz compression.
+
+The ```-f``` flag specifies the filename.
+
+
+## Usage
+Open a terminal or command prompt and navigate to the extracted folder
+
+### Determine which command best suites what you would like to accomplish:
+
+- [**new-mnemonic**](https://deposit-cli.ethstaker.cc/new_mnemonic.html): Used to generate a new mnemonic, validator keys, and deposit file. It is not recommended to use this command if you have existing validators.
+
+  Example Usage
+
+```bash
+./deposit new-mnemonic
+```
+
+- [**existing-mnemonic**](https://deposit-cli.ethstaker.cc/existing_mnemonic.html): Provide a mnemonic to regenerate validator keys or create new ones.
+
+  Example Usage
+
+```bash
+./deposit existing-mnemonic
+```
+
+- generate-bls-to-execution-change: Update your withdrawal credentials of existing validators. It is required to have the corresponding mnemonic.
+
+- generate-bls-to-execution-change-keystore: Sign an update withdrawal credentials message using your validator keystore.
+
+- exit-transaction-keystore: Generate an exit message using the keystore of your validators.
+
+- exit-transaction-mnemonic: Generate an exit message using the mnemonic of your validators.
+
+- partial-deposit: Generate a partial deposit using a validator keystore.
