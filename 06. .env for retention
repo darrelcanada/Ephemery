@@ -2,11 +2,11 @@ TESTNET_DIR=/etc/ephemery
 
 EL_CLIENT=nethermind
 EL_SERVICE=execution
-EL_DATADIR=/var/lib/ethereum/nethermind
+EL_DATADIR=/var/lib/nethermind
 
 CL_CLIENT=prysm
 CL_SERVICE=consensus
-CL_DATADIR=/var/lib/ethereum/prysm-beacon
+CL_DATADIR=/var/lib/
 CL_PORT=3500
 
 VC_CLIENT=lodestar
