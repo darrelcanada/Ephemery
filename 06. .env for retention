@@ -11,7 +11,7 @@ CL_PORT=3500
 
 VC_CLIENT=lighthouse
 VC_SERVICE=validator
-VC_DATADIR=/var/lib/ethereum/lodestar-validator
+VC_DATADIR=/var/lib/lighthouse
 
 EPHEMERY_FILES_USER=ethereum
 EPHEMERY_FILES_GROUP=ethereum
