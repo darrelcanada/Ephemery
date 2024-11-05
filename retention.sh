@@ -1,3 +1,6 @@
+chmod 755 retention.sh
+
+
 #!/bin/bash
 
 log() {
