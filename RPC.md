@@ -158,21 +158,21 @@ async function sendEth() {
 }
 ```
 
-// Run the function
-sendEth();
-How to Run the Script
+## Run the function sendEth();
+
 Save the script above to a file named sendEth.js.
 
 Open your terminal and navigate to the directory where the script is located.
 
 Run the script with:
 
-bash
-Copy code
+```bash
 node sendEth.js
+```
+
 Example Output
 markdown
-Copy code
+```bash
 Enter the sender wallet address: 0x108B5d9A49F8275c1194D07920627A28a55bC7e4
 Enter the sender private key: ***********************
 Enter the recipient wallet address: 0x14086467FeC7672f82C4dBAAe12B02698979E13c
@@ -180,7 +180,9 @@ Enter the amount of ETH to send: 0.1
 Sending transaction...
 Transaction successful!
 Transaction hash: 0x12345abcd6789ef...
-Notes
-Replace 'http://localhost:8545' with your actual Ethereum node RPC endpoint (such as Infura, Alchemy, or your Nethermind node).
-Ensure you have sufficient ETH in the sender's wallet to cover both the amount and gas fees.
-The private key should never be exposed. Use environment variables or secure vaults in a production environment.
+```
+
+## Notes
+* Replace 'http://localhost:8545' with your actual Ethereum node RPC endpoint (such as Infura, Alchemy, or your Nethermind node).
+* Ensure you have sufficient ETH in the sender's wallet to cover both the amount and gas fees.
+* The private key should never be exposed. Use environment variables or secure vaults in a production environment.
