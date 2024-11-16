@@ -1,0 +1,285 @@
+
+
+# Installing Nethermind Client
+
+https://www.coincashew.com/coins/overview-eth/testnet-holesky-validator/step-3-installing-execution-client/nethermind
+
+## 1. Initial configuration
+Create a service user for the execution service, create data directory and assign ownership.
+
+```bash
+sudo adduser --system --no-create-home --group execution
+sudo mkdir -p /var/lib/nethermind
+sudo chown -R execution:execution /var/lib/nethermind
+```
+
+Install dependencies.
+
+```bash
+sudo apt update
+sudo apt install ccze curl libsnappy-dev libc6-dev jq libc6 unzip -y
+```
+
+## 2. Install Binaries
+
+Run the following to automatically download the latest linux release, un-zip and cleanup.
+
+```bash
+RELEASE_URL="https://api.github.com/repos/NethermindEth/nethermind/releases/latest"
+BINARIES_URL="$(curl -s $RELEASE_URL | jq -r ".assets[] | select(.name) | .browser_download_url" | grep linux-x64)"
+
+echo Downloading URL: $BINARIES_URL
+
+cd $HOME
+wget -O nethermind.zip $BINARIES_URL
+unzip -o nethermind.zip -d $HOME/nethermind
+rm nethermind.zip
+```
+
+Install the binaries.
+
+```bash
+sudo mv $HOME/nethermind /usr/local/bin/nethermind
+```
+
+## 3. Setup and configure systemd for Nethermind
+
+```bash
+sudo nano /etc/systemd/system/execution.service
+```
+
+```bash
+[Unit]
+Description=Nethermind Execution Layer Client service for Holesky
+Wants=network-online.target
+After=network-online.target
+Documentation=https://www.coincashew.com
+
+[Service]
+Type=simple
+User=execution
+Group=execution
+Restart=always
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=900
+WorkingDirectory=/var/lib/nethermind
+Environment="DOTNET_BUNDLE_EXTRACT_BASE_DIR=/var/lib/nethermind"
+EnvironmentFile=/etc/ephemery/nodevars_env.txt
+ExecStart=/usr/local/bin/nethermind/nethermind \
+  --config none.cfg \
+  --datadir="/var/lib/nethermind" \
+  --Network.DiscoveryPort 30303 \
+  --Network.P2PPort 30303 \
+  --Network.MaxActivePeers 50 \
+  --JsonRpc.Port 8545 \
+  --JsonRpc.EnginePort 8551 \
+  --Metrics.Enabled true \
+  --Metrics.ExposePort 6060 \
+  --JsonRpc.JwtSecretFile /secrets/jwtsecret \
+  --Pruning.Mode=Hybrid \
+  --Pruning.FullPruningTrigger=VolumeFreeSpace \
+  --Pruning.FullPruningThresholdMb=300000 \
+  --JsonRpc.Enabled true \
+  --Discovery.Bootnodes=${BOOTNODE_ENODE_LIST} \
+  --Init.ChainSpecPath /etc/ephemery/chainspec.json \
+  --Init.GenesisHash ${GENESIS_BLOCK}
+[Install]
+WantedBy=multi-user.target
+```
+To exit and save, press Ctrl + X, then Y, then Enter.
+
+
+Run the following to enable auto-start at boot time.
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable execution
+```
+
+# Installing Lodestar Client
+
+## 1. Initial configuration
+Create a service user for the consensus service, create data directory and assign ownership.
+
+```bash
+sudo adduser --system --no-create-home --group consensus
+sudo mkdir -p /var/lib/lodestar
+sudo chown -R consensus:consensus /var/lib/lodestar
+```
+
+Install dependencies.
+
+```bash
+sudo apt-get install gcc g++ make git curl ccze -y
+```
+
+## 2. Install Binaries
+Run the following to automatically download the latest linux release, un-tar and cleanup.
+
+```bash
+RELEASE_URL="https://api.github.com/repos/ChainSafe/lodestar/releases/latest"
+LATEST_TAG="$(curl -s $RELEASE_URL | jq -r ".tag_name")"
+BINARIES_URL="https://github.com/ChainSafe/lodestar/releases/download/${LATEST_TAG}/lodestar-${LATEST_TAG}-linux-amd64.tar.gz"
+	
+echo Downloading URL: $BINARIES_URL
+
+cd $HOME
+# Download
+wget -O lodestar.tar.gz $BINARIES_URL
+# Untar
+tar -xzvf lodestar.tar.gz -C $HOME
+# Cleanup
+rm lodestar.tar.gz
+```
+
+Install the binaries.
+
+```bash
+sudo mkdir -p /usr/local/bin/lodestar
+sudo mv $HOME/lodestar /usr/local/bin/lodestar
+```
+
+## 3. Setup and configure systemd
+
+Create a systemd unit file to define your ```consensus.service``` configuration.
+
+```bash
+sudo nano /etc/systemd/system/consensus.service
+```
+Paste the following configuration into the file.
+
+```bash
+[Unit]
+Description=Lodestar Validator Client service for Ephemery
+Wants=network-online.target
+After=network-online.target
+Documentation=https://www.coincashew.com
+
+[Service]
+Type=simple
+User=validator
+Group=validator
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=300
+EnvironmentFile=/etc/ephemery/nodevars_env.txt
+ExecStart=/usr/local/bin/lodestar/lodestar validator \
+  --network ephemery \
+  --dataDir /var/lib/lodestar/validators \
+  --beaconNodes http://127.0.0.1:5052 \
+  --metrics true \
+  --metrics.port 8009 \
+  --graffiti "By: RocketPool" \
+  --suggestedFeeRecipient 0x108B5d9A49F8275c1194D07920627A28a55bC7e4
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Replace<0x_CHANGE_THIS_TO_MY_ETH_FEE_RECIPIENT_ADDRESS> with your own Ethereum address that you control. 
+
+To exit and save, press ```Ctrl``` + ```X```, then ```Y```, then ```Enter```.
+
+Run the following to enable auto-start at boot time.
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable consensus
+```
+
+Finally, start your consensus layer client and check it's status.
+
+```bash
+sudo systemctl start consensus
+sudo systemctl status consensus
+```
+
+If you have not already, Start the execution services  
+
+```bash
+sudo systemctl start execution 
+```
+
+## 4. Helpful execution client commands
+```bash
+#View Logs:
+sudo journalctl -fu execution | ccze  
+#Stop:
+sudo systemctl stop execution
+#Start:
+sudo systemctl start execution
+#View Status:
+sudo systemctl status execution
+#Reset Database
+sudo systemctl stop execution
+sudo rm -rf /var/lib/nethermind/*
+sudo systemctl restart execution
+```
+
+## Helpful consensus client commands
+
+```bash
+#View Logs:
+sudo journalctl -fu consensus | ccze  
+#Stop:
+sudo systemctl stop consensus
+#Start:
+sudo systemctl start consensus
+#View Status:
+sudo systemctl status consensus
+#Reset Database
+sudo systemctl stop consensus
+sudo rm -rf /var/lib/lighthouse/beacon
+sudo systemctl restart consensus
+```
+<details>
+<summary>Helpful consensus client commands</summary>
+
+```bash
+#View Logs:
+sudo journalctl -fu consensus | ccze  
+#Stop:
+sudo systemctl stop consensus
+#Start:
+sudo systemctl start consensus
+#View Status:
+sudo systemctl status consensus
+#Reset Database
+sudo systemctl stop consensus
+sudo rm -rf /var/lib/lighthouse/beacon
+sudo systemctl restart consensus
+```
+
+
+
+
+<details>
+<summary>Helpful execution client commands</summary>
+
+```bash
+#View Logs:
+sudo journalctl -fu execution | ccze  
+#Stop:
+sudo systemctl stop execution
+#Start:
+sudo systemctl start execution
+#View Status:
+sudo systemctl status execution
+#Reset Database
+sudo systemctl stop execution
+sudo rm -rf /var/lib/nethermind/*
+sudo systemctl restart execution
+```
+</details>
+
+
+
+
+
+
+
+
+
+
