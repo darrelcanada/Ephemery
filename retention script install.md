@@ -544,3 +544,54 @@ Set Permissions
 ```bash
 sudo chmod 755 retention.sh
 ```
+
+## Install .env file
+
+```bash
+sudo nano /etc/retention/.env
+```
+copy/paste to nano 
+
+```bash
+TESTNET_DIR=/etc/ephemery
+
+EL_CLIENT=nethermind
+EL_SERVICE=execution
+EL_DATADIR=/var/lib/nethermind
+
+CL_CLIENT=lighthouse
+CL_SERVICE=consensus
+CL_DATADIR=/var/lib/lighthouse
+CL_PORT=5052
+
+VC_CLIENT=lighthouse
+VC_SERVICE=validator
+VC_DATADIR=/var/lib/lighthouse
+
+# EPHEMERY_FILES_USER=ethereum
+# EPHEMERY_FILES_GROUP=ethereum
+
+# Set FORCE_RESET to 1 to test reset process
+# FORCE_RESET=1
+```
+
+## Set up Cron for 5 minute cycle
+Open Cron
+
+```bash
+crontab -e
+```
+Select option 1 to edit crontab in nano 
+Add instruction to bottom of cron file
+
+```bash
+*/5 * * * * /usr/local/bin/retention.sh /etc/retention.sh/env >> /var/log/retention.log 2>&1
+```
+
+You can use  FORCE_RESET=1 to Hard Reset Ephemery
+
+Check Chrontab logs
+
+```bash
+tail /var/log/retention.log
+```
