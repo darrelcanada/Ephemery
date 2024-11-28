@@ -539,3 +539,8 @@ main() {
 
 main
 ```
+Set Permissions
+
+```bash
+sudo chmod 755 retention.sh
+```
